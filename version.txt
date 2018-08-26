@@ -1,0 +1,20 @@
+如果你的的整个项目都在 hello 中，尝试在 hello/build.sbt，hello/bar/build.sbt 和 hello/foo/build.sbt
+中定义一个不同的版本（version := "0.6"）。 现在在 sbt 的命令行中执行 show version
+你应该得到这样的信息（随着你定义的任何版本）：
+> show version
+[info] hello-foo/*:version
+[info]  0.7
+[info] hello-bar/*:version
+[info]  0.9
+[info] hello/*:version
+[info]  0.5
+hello-foo/*:version 定义在 hello/foo/build.sbt 中，hello-bar/*:version 定义在 hello/bar/build.sbt 中，
+hello/*:version 定义在 hello/build.sbt 中。 记住 scoped keys 的语法。每个 version key 在对应的项目的 scope 中，
+基于 build.sbt 文件的位置。但是所有的三个 build.sbt 文件都只是整个构建定义的一部分。
+结论：
+在子项目中，你不能有项目的子目录project/，但是可以有*.sbt
+
+交互式shell中选定项目：
+在 sbt 的命令行中，输入 projects 列出你的项目，执行 project <projectname> 可以选择当前项目。
+当你执行 task 像 compile，它会在当前项目上执行。 所以你没有必要去编译 root 项目，你可以只编译子项目。
+例如：subProjectID/compile
