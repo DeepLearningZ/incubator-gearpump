@@ -18,13 +18,13 @@
 
 import sbt._
 import Keys._
-
+/* Dependencies对象将在build.sbt中可用 */
 object Dependencies {
 
   val crossScalaVersionNumbers = Seq("2.11.8")
   val scalaVersionNumber = crossScalaVersionNumbers.last
-  val akkaVersion = "2.5.13"
-  val akkaHttpVersion = "10.1.3"
+  val akkaVersion = "2.5.13" //升级 val akkaVersion = "2.4.16"
+  val akkaHttpVersion = "10.1.3" //升级 val akkaHttpVersion = "10.0.1"
   val hadoopVersion = "2.6.0"
   val hbaseVersion = "1.0.0"
   val commonsHttpVersion = "3.1"
@@ -35,7 +35,7 @@ object Dependencies {
   val upickleVersion = "0.3.4"
   val junitVersion = "4.12"
   val kafkaVersion = "0.8.2.1"
-  val kuduVersion = "1.7.0"
+  val kuduVersion = "1.7.0" //新增
   val jsonSimpleVersion = "1.1"
   val storm09Version = "0.9.6"
   val stormVersion = "0.10.0"
@@ -89,10 +89,11 @@ object Dependencies {
       "com.typesafe.akka" %% "akka-cluster" % akkaVersion,
       "com.typesafe.akka" %% "akka-cluster-tools" % akkaVersion,
       "commons-logging" % "commons-logging" % commonsLoggingVersion,
-      "com.typesafe.akka" %% "akka-distributed-data" % akkaVersion,
+      "com.typesafe.akka" %% "akka-distributed-data" % akkaVersion, // 升级 -experimental
       "com.typesafe.akka" %% "akka-actor" % akkaVersion,
       "com.typesafe.akka" %% "akka-agent" % akkaVersion,
       "com.typesafe.akka" %% "akka-slf4j" % akkaVersion,
+      // "com.typesafe.akka" %% "akka-kernel" % akkaVersion, // 去掉
       "com.typesafe.akka" %% "akka-http" % akkaHttpVersion,
       "com.typesafe.akka" %% "akka-http-spray-json" % akkaHttpVersion,
       "org.scala-lang" % "scala-reflect" % scalaVersionNumber,
