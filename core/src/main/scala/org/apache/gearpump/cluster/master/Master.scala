@@ -50,6 +50,25 @@ import org.apache.gearpump.util._
 /**
  * Master Actor who manages resources of the whole cluster.
  * It is like the resource manager of YARN.
+ *
+ * Master HA:
+ * http://gearpump.apache.org/releases/latest/deployment/deployment-ha/
+ * http://gearpump.apache.org/releases/latest/internals/gearpump-internals/index.html#master-high-availability
+ * To support HA, we allow to start master on multiple nodes. They will form a quorum to decide consistency.
+ * if we start master on 5 nodes and 2 nodes are down, then the cluster is still consistent and functional.
+ * HA可以在多台节点机启动master，保障：多数一致性
+ * Configure distributed storage to store application jars.
+ * In conf/gear.conf, For entry gearpump.jarstore.rootpath, please choose the storage folder for application jars. You need to make sure this jar storage is highly available. We support two storage systems:
+ * 1). HDFS  You need to configure the gearpump.jarstore.rootpath like this:  hdfs://host:port/path/
+ * For HDFS HA:  hdfs://namespace/path/
+ * 2). Shared NFS folder  First you need to map the NFS directory to local directory(same path) on all machines of master nodes. Then you need to set the gearpump.jarstore.rootpath like this:
+ * file:///your_nfs_mapping_directory
+ * 3). If you don't set this value, we will use the local directory of master node. NOTE! There is no HA guarantee in this case, which means we are unable to recover running applications when master goes down.
+ * Start Daemon: bin/master -ip node1 -port 3000.  Now you have a highly available HA cluster. You can kill any node, the master HA will take effect.
+ *
+ * NOTE: It can take up to 15 seconds for master node to fail-over. You can change the fail-over timeout time by adding config in gear.conf gearpump-master.akka.cluster.auto-down-unreachable-after=10s or set it to a smaller value
+ *
+ * In case of a master crash, other standby masters will be notified, they will resume the master state, and take over control. Worker and AppMaster will also be notified, They will trigger a process to find the new active master, until the resolution complete. If AppMaster or Worker cannot resolve a new Master in a time out, they will make suicide and kill themselves.
  */
 private[cluster] class Master extends Actor with Stash {
   private val LOG: Logger = LogUtil.getLogger(getClass)
@@ -75,6 +94,7 @@ private[cluster] class Master extends Actor with Stash {
   Metrics(context.system).register(new JvmMetricsSet(s"master"))
 
   LOG.info("master is started at " + ActorUtil.getFullPath(context.system, self.path) + "...")
+//  INFO Master: master is started at akka.tcp://master@127.0.0.1:3000/user/singleton/masterwatcher/master...
 
   val jarStoreRootPath = systemConfig.getString(Constants.GEARPUMP_APP_JAR_STORE_ROOT_PATH)
 
