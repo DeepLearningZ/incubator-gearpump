@@ -19,6 +19,10 @@ package org.apache.gearpump.cluster.main
 
 import org.apache.gearpump.util.Constants
 
+/**
+ * Gearpump client
+ * http://gearpump.apache.org/releases/latest/introduction/commandline/
+ */
 object Gear {
 
   val OPTION_CONFIG = "conf"
