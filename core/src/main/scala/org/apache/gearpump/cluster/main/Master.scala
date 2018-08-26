@@ -39,6 +39,9 @@ import scala.collection.immutable
 import scala.concurrent.Await
 import scala.concurrent.duration._
 
+/* start master: bin/master -ip xx -port xx
+ * The ip and port will be checked against settings under conf/gear.conf, so you need to make sure they are consistent.
+ * */
 object Master extends AkkaApp with ArgumentsParser {
 
   private var LOG: Logger = LogUtil.getLogger(getClass)
@@ -58,7 +61,7 @@ object Master extends AkkaApp with ArgumentsParser {
       LogUtil.getLogger(getClass)
     }
 
-    val config = parse(args)
+    val config = parse(args)// ArgumentsParser方法
     master(config.getString("ip"), config.getInt("port"), akkaConf)
   }
 
@@ -91,6 +94,7 @@ object Master extends AkkaApp with ArgumentsParser {
 
     val replicator = DistributedData(system).replicator
     LOG.info(s"Replicator path: ${replicator.path}")
+//    INFO Master$: Replicator path: akka://master/system/ddataReplicator
 
     // Starts singleton manager
     val singletonManager = system.actorOf(ClusterSingletonManager.props(
@@ -98,7 +102,9 @@ object Master extends AkkaApp with ArgumentsParser {
       terminationMessage = PoisonPill,
       settings = ClusterSingletonManagerSettings(system).withSingletonName(MASTER_WATCHER)
         .withRole(MASTER)),
-      name = SINGLETON_MANAGER)
+      name = SINGLETON_MANAGER
+    )
+//INFO ClusterSingletonManager: Singleton manager starting singleton actor [akka://master/user/singleton/masterwatcher]
 
     // Start master proxy
     val masterProxy = system.actorOf(ClusterSingletonProxy.props(
@@ -111,6 +117,7 @@ object Master extends AkkaApp with ArgumentsParser {
     )
 
     LOG.info(s"master proxy is started at ${masterProxy.path}")
+//    INFO Master$: master proxy is started at akka://master/user/master  先于CSM打印：CSM为独立actor、由异步多线程去执行...
 
     val mainThread = Thread.currentThread()
     Runtime.getRuntime().addShutdownHook(new Thread() {
@@ -170,7 +177,7 @@ class MasterWatcher(role: String) extends Actor with ActorLogging {
       membersByAge = immutable.SortedSet.empty(ageOrdering) ++ state.members.filter(m =>
         m.status == MemberStatus.Up && matchingRole(m))
 
-      if (membersByAge.size < quorum) {
+      if (membersByAge.size < quorum) { // 法定多数二次守卫
         membersByAge.iterator.mkString(",")
         log.info(s"We cannot get a quorum, $quorum, " +
           s"shutting down...${membersByAge.iterator.mkString(",")}")
