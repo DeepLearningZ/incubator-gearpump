@@ -32,7 +32,11 @@ import scala.collection.JavaConverters._
 import scala.concurrent.Await
 import scala.concurrent.duration.Duration
 
-/** Tool to start a worker daemon process */
+/** Tool to start a worker daemon process
+ *
+ * What happens when the Master crashes?  gearpump.apache.org/releases/latest/internals/gearpump-internals/index.html
+ * Worker and AppMaster will also be notified, They will trigger a process to find the new active master, until the resolution complete. If AppMaster or Worker cannot resolve a new Master in a time out, they will make suicide and kill themselves.
+ * */
 object Worker extends AkkaApp with ArgumentsParser {
   protected override def akkaConfig = ClusterConfig.worker()
 
@@ -60,7 +64,8 @@ object Worker extends AkkaApp with ArgumentsParser {
     }
 
     LOG.info(s"Trying to connect to masters " + masterAddress.mkString(",") + "...")
-    val masterProxy = system.actorOf(MasterProxy.props(masterAddress), s"masterproxy${system.name}")
+    val masterProxy = system.actorOf(MasterProxy.props(masterAddress) // 逻辑path= /user/master
+      , s"masterproxy${system.name}")
 
     system.actorOf(Props(classOf[WorkerActor], masterProxy),
       classOf[WorkerActor].getSimpleName + id)
