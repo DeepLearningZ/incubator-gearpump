@@ -18,13 +18,13 @@
 
 import sbt._
 import Keys._
-/* Dependencies对象将在build.sbt中可用 */
+
 object Dependencies {
 
   val crossScalaVersionNumbers = Seq("2.11.8")
   val scalaVersionNumber = crossScalaVersionNumbers.last
-  val akkaVersion = "2.5.13" //升级 val akkaVersion = "2.4.16"
-  val akkaHttpVersion = "10.1.3" //升级 val akkaHttpVersion = "10.0.1"
+  val akkaVersion = "2.5.13" // 升级 val akkaVersion = "2.4.16"
+  val akkaHttpVersion = "10.1.3" // 升级 val akkaHttpVersion = "10.0.1"
   val hadoopVersion = "2.6.0"
   val hbaseVersion = "1.0.0"
   val commonsHttpVersion = "3.1"
@@ -35,7 +35,7 @@ object Dependencies {
   val upickleVersion = "0.3.4"
   val junitVersion = "4.12"
   val kafkaVersion = "0.8.2.1"
-  val kuduVersion = "1.7.0" //新增
+  val kuduVersion = "1.7.0" // 新增
   val jsonSimpleVersion = "1.1"
   val storm09Version = "0.9.6"
   val stormVersion = "0.10.0"
@@ -70,7 +70,6 @@ object Dependencies {
       "org.slf4j" % "slf4j-api" % slf4jVersion,
       "org.slf4j" % "slf4j-log4j12" % slf4jVersion,
       "commons-lang" % "commons-lang" % commonsLangVersion,
-
       /**
        * Overrides Netty version 3.10.3.Final used by Akka 2.4.2 to work-around netty hang issue
        * (https://github.com/gearpump/gearpump/issues/2020)
